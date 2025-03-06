@@ -2,8 +2,10 @@ import { Scene } from 'phaser';
 
 export class Game extends Scene {
     platforms: Phaser.Physics.Arcade.StaticGroup;
-    player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    player1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    player2: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+    keys: any;
     stars: any;
     constructor() {
         super('Game');
@@ -23,6 +25,7 @@ export class Game extends Scene {
 
     create() {
         this.cursors = this.input.keyboard!.createCursorKeys();
+        this.keys = this.input.keyboard!.addKeys("W,A,S,D");
 
         this.add.image(400, 300, 'sky');
 
@@ -30,16 +33,19 @@ export class Game extends Scene {
 
         this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        this.platforms.create(600, 400, 'ground');
-        this.platforms.create(50, 250, 'ground');
-        this.platforms.create(750, 220, 'ground');
 
-        this.player = this.physics.add.sprite(100, 450, 'dude');
 
-        this.player.setBounce(0.2);
-        this.player.setCollideWorldBounds(true);
 
-        this.physics.add.collider(this.player, this.platforms);
+        this.player1 = this.physics.add.sprite(100, 511, 'dude');
+        this.player1.setBounce(0.2);
+        this.player1.setCollideWorldBounds(true);
+        this.physics.add.collider(this.player1, this.platforms);
+
+        this.player2 = this.physics.add.sprite(700, 511, 'dude');
+        this.player2.setTint(0xff0000)
+        this.player2.setBounce(0.2);
+        this.player2.setCollideWorldBounds(true);
+        this.physics.add.collider(this.player2, this.platforms);
 
         this.anims.create({
             key: 'left',
@@ -61,41 +67,45 @@ export class Game extends Scene {
             repeat: -1
         });
 
-        this.stars = this.physics.add.group({
-            key: 'star' ,
-            repeat:11,
-            setXY: {
-                x: 12,
-                y: 0,
-                stepX: 70,
-            },
-        });
-
-        this.stars.children.iterate( function(star:any){
-            star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-            return null;
-        })
-    
-        this.physics.add.collider(this.stars, this.platforms);
+       
     
     }
 
     update() {
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-160);
-            this.player.anims.play('left', true);
+
+        // Player 1 (WASD)
+        if (this.keys.A.isDown) {
+            this.player1.setVelocityX(-160);
+            this.player1.anims.play('left', true);
         }
-        else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(160);
-            this.player.anims.play('right', true);
+        else if (this.keys.D.isDown) {
+            this.player1.setVelocityX(160);
+            this.player1.anims.play('right', true);
         }
         else {
-            this.player.setVelocityX(0);
-            this.player.anims.play('turn');
+            this.player1.setVelocityX(0);
+            this.player1.anims.play('turn');
         }
 
-        if (this.cursors.up.isDown && this.player.body.touching.down) {
-            this.player.setVelocityY(-330);
+        if (this.keys.W.isDown && this.player1.body.touching.down) {
+            this.player1.setVelocityY(-330);
+        }
+        // Player 2 (arrow keys)
+        if (this.cursors.left.isDown) {
+            this.player2.setVelocityX(-160);
+            this.player2.anims.play('left', true);
+        }
+        else if (this.cursors.right.isDown) {
+            this.player2.setVelocityX(160);
+            this.player2.anims.play('right', true);
+        }
+        else {
+            this.player2.setVelocityX(0);
+            this.player2.anims.play('turn');
+        }
+
+        if (this.cursors.up.isDown && this.player2.body.touching.down) {
+            this.player2.setVelocityY(-330);
         }
     }
 }
