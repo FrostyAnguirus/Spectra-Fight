@@ -33,6 +33,11 @@ export class Game extends Scene {
 
         this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
+        var score = 0;
+        var scoreText;
+
+        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+
 
 
 
