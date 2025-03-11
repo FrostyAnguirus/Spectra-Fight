@@ -5,6 +5,9 @@ export class Game extends Scene {
     player1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     player2: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+    player1Health = 100;
+    player2Health = 100;
+    healthText: any;
     keys: any;
     stars: any;
     constructor() {
@@ -25,7 +28,7 @@ export class Game extends Scene {
 
     create() {
         this.cursors = this.input.keyboard!.createCursorKeys();
-        this.keys = this.input.keyboard!.addKeys("W,A,S,D");
+        this.keys = this.input.keyboard!.addKeys("W,A,S,D,N,Q");
 
         this.add.image(400, 300, 'sky');
 
@@ -33,12 +36,7 @@ export class Game extends Scene {
 
         this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        var score = 0;
-        var scoreText;
-
-        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-
+        this.healthText = this.add.text(16, 16, 'P1: ' + this.player1Health + " | P2: " + this.player2Health, { fontSize: '32px', fill: '#000' });
 
 
         this.player1 = this.physics.add.sprite(100, 511, 'dude');
@@ -51,6 +49,18 @@ export class Game extends Scene {
         this.player2.setBounce(0.2);
         this.player2.setCollideWorldBounds(true);
         this.physics.add.collider(this.player2, this.platforms);
+
+        let onPlayersCollide = (_player1: any, _player2: any) => {
+            if (this.keys.N.isDown/* player 2 attacking */) {
+                this.player1Health -= 1;
+            }
+
+            if (this.keys.Q.isDown/* player 1 attacking */) {
+                this.player2Health -= 1;
+            }
+            this.healthText.setText('P1: ' + this.player1Health + " | P2: " + this.player2Health);
+        }
+        this.physics.add.overlap(this.player1, this.player2, onPlayersCollide, undefined, this);
 
         this.anims.create({
             key: 'left',
@@ -72,8 +82,6 @@ export class Game extends Scene {
             repeat: -1
         });
 
-       
-    
     }
 
     update() {
@@ -111,6 +119,14 @@ export class Game extends Scene {
 
         if (this.cursors.up.isDown && this.player2.body.touching.down) {
             this.player2.setVelocityY(-330);
+        }
+
+        // Did anyone hit 0 health?
+        if (this.player1Health<=0){
+            this.scene.start("GameOver");
+        }
+        if (this.player2Health<=0){
+            this.scene.start("GameOver");
         }
     }
 }
