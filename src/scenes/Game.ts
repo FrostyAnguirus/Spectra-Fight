@@ -27,6 +27,8 @@ export class Game extends Scene {
     }
 
     create() {
+        this.player1Health=100
+        this.player2Health=100
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.keys = this.input.keyboard!.addKeys("W,A,S,D,N,Q");
 
@@ -81,6 +83,7 @@ export class Game extends Scene {
             frameRate: 10,
             repeat: -1
         });
+        
 
     }
 
@@ -100,7 +103,7 @@ export class Game extends Scene {
             this.player1.anims.play('turn');
         }
 
-        if (this.keys.W.isDown && this.player1.body.touching.down) {
+        if (this.keys.W.isDown && this.player1.body.y > 485) {
             this.player1.setVelocityY(-330);
         }
         // Player 2 (arrow keys)
@@ -117,7 +120,7 @@ export class Game extends Scene {
             this.player2.anims.play('turn');
         }
 
-        if (this.cursors.up.isDown && this.player2.body.touching.down) {
+        if (this.cursors.up.isDown && this.player2.body.y > 485) {
             this.player2.setVelocityY(-330);
         }
 
