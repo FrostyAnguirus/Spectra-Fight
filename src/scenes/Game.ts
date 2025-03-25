@@ -7,9 +7,12 @@ export class Game extends Scene {
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     player1Health = 100;
     player1ImmunityFrames = 0;
+    player1BlockCoolDown=0
     player2Health = 100;
     player2ImmunityFrames = 0;
+    player2BlockCoolDown=0
     healthText: any;
+    messageText:any;
     keys: any;
     stars: any;
     constructor() {
@@ -32,7 +35,7 @@ export class Game extends Scene {
         this.player1Health=100
         this.player2Health=100
         this.cursors = this.input.keyboard!.createCursorKeys();
-        this.keys = this.input.keyboard!.addKeys("W,A,S,D,N,Q");
+        this.keys = this.input.keyboard!.addKeys("W,A,S,D,N,Q,E,M");
 
         this.add.image(400, 300, 'sky');
 
@@ -95,8 +98,13 @@ export class Game extends Scene {
         if (this.player1ImmunityFrames > 0){
             this.player1ImmunityFrames = this.player1ImmunityFrames - 1;
         }
+        if (this.player1BlockCoolDown > 0){
+            this.player1BlockCoolDown = this.player1BlockCoolDown - 1;
+        }
         if (this.player1ImmunityFrames % 4 >= 2){ // every other immunity frame ( 0 1 2 3)
             this.player1.setTint(0x888888);
+        } else if (this.player1ImmunityFrames == 0 && this.player1BlockCoolDown > 0){
+            this.player1.setTint(0x0000ff)
         } else {
             this.player1.setTint(0xffffff)
         }
@@ -104,11 +112,18 @@ export class Game extends Scene {
         if (this.player2ImmunityFrames > 0){
             this.player2ImmunityFrames = this.player2ImmunityFrames - 1;
         }
+        if (this.player2BlockCoolDown > 0){
+            this.player2BlockCoolDown = this.player2BlockCoolDown - 1;
+        }
         if (this.player2ImmunityFrames % 4 >= 2){ // every other immunity frame ( 0 1 2 3)
             this.player2.setTint(0x888888);
+        } else if (this.player2ImmunityFrames == 0 && this.player2BlockCoolDown > 0){
+            this.player2.setTint(0xf8fc03)
         } else {
             this.player2.setTint(0xf00000)
         }
+
+
 
         // Player 1 (WASD)
         if (this.keys.A.isDown) {
@@ -144,6 +159,18 @@ export class Game extends Scene {
         if (this.cursors.up.isDown && this.player2.body.y > 485) {
             this.player2.setVelocityY(-330);
         }
+
+        
+        if (this.player1BlockCoolDown <= 0 /*block is ready */ && this.keys.E.isDown/*blocking*/) {
+            this.player1ImmunityFrames = this.player1ImmunityFrames + 10
+            this.player1BlockCoolDown = 40
+        }
+        if (this.player2BlockCoolDown <= 0 /*block is ready */ && this.keys.M.isDown/*blocking*/) {
+            this.player2ImmunityFrames = this.player2ImmunityFrames + 10
+            this.player2BlockCoolDown = 40
+        }
+
+
 
         // Did anyone hit 0 health?
         if (this.player1Health<=0){
